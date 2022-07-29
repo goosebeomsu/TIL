@@ -77,6 +77,20 @@ Today I Learned 머리보단 기록을 믿자
 
 * [7-7. 쿠키](https://github.com/goosebeomsu/TIL/blob/master/network/7.%20HTTP%ED%97%A4%EB%8D%941%20-%20%EC%9D%BC%EB%B0%98%20%ED%97%A4%EB%8D%94/7-7.%20%EC%BF%A0%ED%82%A4.md)
 
+#### 8. HTTP 헤더2 - 캐시와 조건부 요청
+
+* [8-1. 캐시 기본 동작](https://github.com/goosebeomsu/TIL/blob/master/network/8.%20HTTP%20%ED%97%A4%EB%8D%942%20-%20%EC%BA%90%EC%8B%9C%EC%99%80%20%EC%A1%B0%EA%B1%B4%EB%B6%80%20%EC%9A%94%EC%B2%AD/8-1.%20%EC%BA%90%EC%8B%9C%20%EA%B8%B0%EB%B3%B8%20%EB%8F%99%EC%9E%91.md)
+
+* [8-2. 검증 헤더와 조건부 요청](https://github.com/goosebeomsu/TIL/blob/master/network/8.%20HTTP%20%ED%97%A4%EB%8D%942%20-%20%EC%BA%90%EC%8B%9C%EC%99%80%20%EC%A1%B0%EA%B1%B4%EB%B6%80%20%EC%9A%94%EC%B2%AD/8-2.%20%EA%B2%80%EC%A6%9D%20%ED%97%A4%EB%8D%94%EC%99%80%20%EC%A1%B0%EA%B1%B4%EB%B6%80%20%EC%9A%94%EC%B2%AD.md)
+
+* [8-3. 캐시와 조건부 요청 헤더](https://github.com/goosebeomsu/TIL/blob/master/network/8.%20HTTP%20%ED%97%A4%EB%8D%942%20-%20%EC%BA%90%EC%8B%9C%EC%99%80%20%EC%A1%B0%EA%B1%B4%EB%B6%80%20%EC%9A%94%EC%B2%AD/8-3.%20%EC%BA%90%EC%8B%9C%EC%99%80%20%EC%A1%B0%EA%B1%B4%EB%B6%80%20%EC%9A%94%EC%B2%AD%20%ED%97%A4%EB%8D%94.md)
+
+* [8-4. 프록시 캐시 & 캐시 무효화](https://github.com/goosebeomsu/TIL/blob/master/network/8.%20HTTP%20%ED%97%A4%EB%8D%942%20-%20%EC%BA%90%EC%8B%9C%EC%99%80%20%EC%A1%B0%EA%B1%B4%EB%B6%80%20%EC%9A%94%EC%B2%AD/8-4.%20%ED%94%84%EB%A1%9D%EC%8B%9C%20%EC%BA%90%EC%8B%9C%20%26%20%EC%BA%90%EC%8B%9C%20%EB%AC%B4%ED%9A%A8%ED%99%94.md)
+
+
+
+
+
 
 
  
