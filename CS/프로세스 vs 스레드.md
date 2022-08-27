@@ -1,5 +1,8 @@
 # 프로세스 vs 스레드
 
+출처: [[10분 테코톡] 🌷 코다의 Process vs Thread](https://www.youtube.com/watch?v=1grtWKqTn50&list=WL&index=1&t=6s)
+
+
 * **프로그램**: 어떤 작업을 하기 위해 실행할 수 있는 exe와 같은 파일
 * **프로세스**: 메모리상에서 프로그램이 실행되고 있는 상태
 * **스레드**: 프로세스 내에서 실행되는 흐름의 단위
