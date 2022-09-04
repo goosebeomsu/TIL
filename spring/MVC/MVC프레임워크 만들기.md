@@ -106,6 +106,64 @@ public class MyView {
 * 우리가 구현한 컨트롤러에서 **View와 관련된 코드의 중복 개선**
 
 
+## Model 추가 - v3
+
+**서블릿 종속성 제거**
+* 구현한 컨트롤러가  HttpServletRequest, HttpServletResponse 을 사용하지 않도록 바꿈
+* request.getParameter를 통해 파라미터 정보를 찾지 않고 Map을 통해 파라미터 정보를 넘기는 방식으로 변경
+* request.setAttribute로 데이터를 View에 넘기지 않고 별도의 Model 객체를 만들어 반환
+
+**뷰 이름 중복 제거**
+* /WEB-INF/views/new-form.jsp -> **new-form**
+* 위와 같이 뷰의 논리 이름을 반환하면 실제 물리적인 이름은 프론트 컨트롤러에서 처리하도록 변경
+* 이렇게 하면 뷰의 폴더 위치가 변경되어도 프론트컨트롤러만 고치면 됨
+
+![image](https://user-images.githubusercontent.com/83762364/188301037-8e625361-8904-46a9-acca-c9dc8801446c.png)
+
+#### ModelView 객체
+
+```java
+public class ModelView {
+    private String viewName;
+    private Map<String, Object> model = new HashMap<>();
+
+    public ModelView(String viewName) {
+        this.viewName = viewName;
+    }
+}
+```
+
+* 구현한 컨트롤러에서 ModelView를 리턴
+* viewName에 뷰의 논리이름, model에 뷰로 전달한 데이터를 담음
+
+
+#### 프론트 컨트롤러
+
+**V2 코드**
+
+```java
+ MyView view = controller.process(request, response);
+ view.render(request, response);
+```
+
+**V3 코드**
+
+```java
+ Map<String, String> paramMap = createParamMap(request);
+
+ ModelView mv = controller.process(paramMap);
+ String viewName = mv.getViewName();
+
+ MyView view = viewResolver(viewName);
+
+ view.render(mv.getModel(), request, response);
+```
+
+* 프론트 컨트롤러에서 클라이언트로 부터 온 파라미터 정보를 맵에 담는다
+* 구현한 컨트롤러에 매개변수로 request와 response대신 paramMap을 넘긴다
+* 컨트롤러에서는 paramMap을 통해 파라미터를 조회하고 View의 논리이름과 View로 전달할 데이터의 정보가 담겨있는 ModelView를 리턴
+* 프론트 컨트롤러에서 모델뷰에 담겨 있는 논리이름을 조회하여 viewResolver를 통해 실제 물리이름으로 변경하여 실제 경로가 담겨있는 MyView를 리턴 
+* 기존의 render에서 model을 추가로 받는 메서드를 통해 request.setAttribute를 render에서 처리
 
 
 
