@@ -165,6 +165,129 @@ public class ModelView {
 * 프론트 컨트롤러에서 모델뷰에 담겨 있는 논리이름을 조회하여 viewResolver를 통해 실제 물리이름으로 변경하여 실제 경로가 담겨있는 MyView를 리턴 
 * 기존의 render에서 model을 추가로 받는 메서드를 통해 request.setAttribute를 render에서 처리
 
+<br>
+
+**이전 코드**
+
+![image](https://user-images.githubusercontent.com/83762364/188576294-7da01f58-11ca-4dd1-8849-b6315a0a1bd3.png)
+
+**개선 코드**
+
+![image](https://user-images.githubusercontent.com/83762364/188576444-bc7a7f92-ed1a-4212-aaca-81356756bf1f.png)
+
+## 단순하고 실용적인 컨트롤러 - v4
+
+**ModelView대신 String 리턴**
+
+* 개발자가 실제 구현한 컨트롤러에서 항상 ModelView 객체를 생성하여 반환해야해서 번거로움
+* 컨트롤러에서 ModelView대신 String 형식의 ViewName만 리턴해서 번거로움을 줄임
+
+![image](https://user-images.githubusercontent.com/83762364/188578149-53e2d47e-14b5-4f9a-912d-ef4311ec134c.png)
+
+#### 프론트 컨트롤러
+
+**V3 코드**
+
+```java
+        Map<String, String> paramMap = createParamMap(request);
+
+        ModelView mv = controller.process(paramMap);
+        String viewName = mv.getViewName();
+
+        MyView view = viewResolver(viewName);
+
+        view.render(mv.getModel(), request, response);
+```
+
+**V4 코드**
+
+```java
+        Map<String, String> paramMap = createParamMap(request);
+        Map<String, Object> model = new HashMap<>();
+
+        String viewName = controller.process(paramMap, model);
+
+        MyView view = viewResolver(viewName);
+        view.render(model, request, response);
+```
+
+* model객체를 프론트컨트롤러에서 미리 생성한다
+* controller의 process메서드에 파라미터로 model을 같이 넘기고 viewName을 리턴
+* 구현한 컨트롤러에서는 ModelView를 사용하지 않고 파라미터로 넘어온 model에 데이터를 넣고 viewName을 리턴
+
+<br>
+
+**이전 코드**
+
+![image](https://user-images.githubusercontent.com/83762364/188581287-b11eb2f8-480f-470e-8362-f5435b6b2d4e.png)
+
+**개선 코드**
+
+![image](https://user-images.githubusercontent.com/83762364/188581447-a18ea991-168c-49e6-8523-7e15a5de77da.png)
+
+
+## 유연한 컨트롤러 - v5
+
+**어댑터 패턴 적용**
+
+* 어떤 개발자는 ModelView를 리턴하고 싶고 어떤 개발자는 viewName을 리턴하고 싶을때
+* 어댑터 패턴을 통해 프론트 컨트롤러가 다양한 방식의 컨트롤러를 처리할 수 있도록 변경
+
+![image](https://user-images.githubusercontent.com/83762364/188582448-cefdddde-9798-4ed2-aba3-f20c00fbc226.png)
+
+프론트 컨트롤러는 핸들러(컨트롤러) 매핑 정보에서 요청 URL를 기반으로 핸들러를 조회한다. 다음으로 조회한 핸들러를 지원할 수 있는 핸들러 어댑터를 핸들러 어댑터 목록에서 찾는다. 이제 프론트 컨트롤러는 컨트롤러를 직접 호출하지 않고, 핸들러 어댑터가 대신 호출해준다. 프론트 컨트롤러는 핸들러 어댑터가 반환해준 넘어온 ModelView 객체를 가지고 논리 이름을 물리 이름으로 바꾸어 렌더링해주면 된다.
+
+#### MyHandlerAdapter
+
+![image](https://user-images.githubusercontent.com/83762364/188586130-9826e0de-487e-4ac1-96cd-6131d6e4e9d7.png)
+
+* **supports**: 어댑터가 해당 컨트롤러를 처리할 수 있으면 true반환
+* **handle**: 컨트롤러를 호출하고 ModelView반환, ModelView를 반환하지 않는 경우, 어댑터가 직접 생성
+
+#### ControllerV3HandlerAdapter
+
+![image](https://user-images.githubusercontent.com/83762364/188587243-9b7e9a3d-1ba9-45c1-afda-50c5da6464d9.png)
+
+* ModelView를 리턴하는 ControllerV3를 지원하는 핸들러 어댑터
+* supports를 통해 매개변수로 들어오는 핸들러가 처리할 수 있는 핸들러인지 검사
+* 컨트롤러의 process를 호출하여 ModelView를 프론트 컨트롤러에 전달
+
+#### ControllerV4HandlerAdapter
+
+![image](https://user-images.githubusercontent.com/83762364/188588326-f524cc41-b600-43f9-8433-fe4e7013ee4c.png)
+
+* 컨트롤러가 viewName을 리턴하는 경우 어댑터에서 ModelView를 생성해서 리턴
+
+#### FrontControllerV5 - 핸들러 매핑 정보, 핸들러 어댑터 목록
+
+![image](https://user-images.githubusercontent.com/83762364/188588872-9aaf35f8-b85c-41af-a195-6773c16e600f.png)
+
+* initHandlerMappingMap을 통해 사용할 컨트롤러들을 추가
+* initHandlerAdapters를 통해 사용할 어댑터들을 추가
+* FrontController는 생성될 때 handlerMappingMap과 handlerAdapters를 가지고 있다
+
+#### FrontControllerV5 - 메서드
+
+![image](https://user-images.githubusercontent.com/83762364/188590721-b08daf80-f4da-4e8f-b8af-e44fadcf001c.png)
+
+* **getHandler**: 요청URI를 통해 handlerMappingMap에 있는 사용할 컨트롤러를 찾음
+* **getHandlerAdapter**: MyHandlerAdapter에서 컨트롤러에 맞는 어댑터를 찾아서 리턴
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
