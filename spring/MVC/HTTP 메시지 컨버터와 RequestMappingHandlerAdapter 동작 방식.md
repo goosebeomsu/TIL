@@ -1,0 +1,81 @@
+# HTTP 메시지 컨버터와 RequestMappingHandlerAdapter 동작 방식
+
+출처: [스프링 MVC 1편](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-mvc-1/dashboard)
+
+**뷰 템플릿으로 HTML을 생성해서 응답하지 않고 JSON 데이터를 HTTP 메시지바디에서 직접 읽고 쓰는 경우 HTTP 메시지 컨버터를 사용**
+
+## @ResponseBody 사용시 효과
+
+* HTTP의 BODY에 문자 내용을 직접 반환
+* viewResolver 대신에 HttpMessageConverter 가 동작
+* 기본 문자처리: StringHttpMessageConverter
+* 기본 객체처리: MappingJackson2HttpMessageConverter
+* byte 처리 등등 기타 여러 HttpMessageConverter가 기본으로 등록되어 있음
+
+## HTTP 메시지 컨버터
+
+#### HTTP 메시지 컨버터를 적용되는 경우
+
+* HTTP 요청: @RequestBody , HttpEntity(RequestEntity)
+* HTTP 응답: @ResponseBody , HttpEntity(ResponseEntity)
+
+<br>
+
+#### HTTP 메시지 컨버터 인터페이스
+
+![image](https://user-images.githubusercontent.com/83762364/189519065-3a2c2a45-49ca-420e-be26-431613c0737f.png)
+
+HTTP 메시지 컨버터는 HTTP 요청, HTTP 응답 둘 다 사용
+* canRead() , canWrite(): 메시지 컨버터가 해당 클래스(String, 객체 등), 미디어타입(컨텐츠타입)을 지원하는지 체크
+* read() , write() : 메시지 컨버터를 통해서 메시지를 읽고 쓰는 기능
+
+<br>
+
+#### 스프링 부트 주요 메시지 컨버터
+
+* 스프링 부트는 다양한 메시지 컨버터를 제공, 대상 클래스 타입과 미디어 타입 둘을 체크해해서 사용여부 결정
+* 만족하지 않으면 다음 메시지 컨버터로 우선순위가 넘어감
+
+* **ByteArrayHttpMessageConverter**: byte[] 데이터 처리
+  * 클래스 타입: byte[], 미디어타입: * / *
+  * 파일업로드 등 사용
+
+* **StringHttpMessageConverter**: String 문자로 데이터 처리
+  * 클래스 타입: String , 미디어타입: * / *
+  * 요청 예) @RequestBody String data
+  * 응답 예) @ResponseBody return "ok" 쓰기 미디어타입 text/plain
+
+* **MappingJackson2HttpMessageConverter**: application/json
+  * 클래스 타입: 객체 또는 HashMap , 미디어타입 application/json 관련
+  * 요청 예) @RequestBody HelloData data
+  * 응답 예) @ResponseBody return helloData 쓰기 미디어타입 application/json 관련
+
+<br>
+
+## RequestMappingHandlerAdapter 동작 방식
+
+HTTP 메시지 컨버터는 @RequestMapping 을 처리하는 핸들러 어댑터인 RequestMappingHandlerAdapter이 과정에 숨어있음
+
+![image](https://user-images.githubusercontent.com/83762364/189520210-a842d273-5751-4e79-bfaa-4869b230a8f8.png)
+
+#### ArgumentResolver
+
+* @ 기반 컨트롤러가 @RequestParam , @ModelAttribute, Model등 다양한 파라미터를 사용가능하게 함
+* RequestMappingHandlerAdapter가 ArgumentResolver 를 호출해서 컨트롤러가 필요로 하는 파라미터를 생성
+* 파리미터의 값이 모두 준비되면 컨트롤러를 호출하면서 값을 넘겨줌
+
+#### HTTTP 메시지 컨버터 위치
+
+![image](https://user-images.githubusercontent.com/83762364/189519909-d21f5558-6938-4f10-8837-5de4eb556e64.png)
+
+* **요청의 경우** ArgumentResolver가 호출되면서 컨트롤러에서 필요한 파라미터를 생성할때 @ReuestBody나 HttpEntitiy가 있으면 HTTP메시지컨버터 사용
+* **응답의 경우** 우 @ResponseBody 와 HttpEntity가 있으면 ReturnValueHandler에서 HTTP메시지컨버터 사용
+
+
+
+
+
+
+
+
+
