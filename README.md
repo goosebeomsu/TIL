@@ -1,5 +1,5 @@
 # TIL
-Today I Learned 머리보단 기록을 믿자
+:book: Today I Learned 공부기록
 
 
 ## git
